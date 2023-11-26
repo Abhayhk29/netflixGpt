@@ -1,11 +1,18 @@
 import {useRef, useState} from 'react'
 import Header from "./Header"
 import checkVaildData from "../utils/validate";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from '../utils/firebase';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addUser } from '../utils/userSlice';
 
 
 const Login = () => {
+  const navigate = useNavigate();
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [error, setError] = useState(null)
+  const dispatch = useDispatch();
 
   const email = useRef(null);
   const password = useRef(null);
@@ -17,10 +24,50 @@ const Login = () => {
 
   const handleButtonClick = () => {
     // checkVaildData()
-    console.log(email.current.value)
     let validate = checkVaildData(email.current.value,password.current.value)
-    console.log(validate)
-    setError(validate)
+    setError(validate);
+    if(validate) return;
+      
+    // signin or sign up
+    if(!isSignInForm){
+      // signup
+      createUserWithEmailAndPassword(auth,email.current.value, password.current.value)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          updateProfile(user, {
+            displayName: `${name.current.value}`,
+            photoURL: 'https://avatars.githubusercontent.com/u/962522?v=4'
+          }).then(() => {
+            const {uid, email, displayName, photoURL } = auth.currentUser;
+            dispatch(addUser({
+              uid:uid, email:email, displayName:displayName, photoURL:photoURL
+            }))
+            navigate("/browse")
+            console.log(user);
+          }).catch((error) => {
+          })
+        }).catch((error) => {
+          const errorCode = error.code;
+          const errMessage = error.message;
+          setError(errorCode + "-" + errMessage);
+        })
+    } else {
+      // signin
+      signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          navigate("/browse")
+          console.log(user)
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errMessage = error.message;
+          setError(errorCode + "-" + errMessage);
+        })
+    }
+
+
+
   }
   return (
     <div>
