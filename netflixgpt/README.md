@@ -89,7 +89,18 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
  - created redux store with userSLice
  - Signup
  - Update Profile
- - 
+ - Fixed bug 
+ - unsubsribed to the onAuthSubscribed call back
+ - add hard coded value to the constant file
+ -Registered the API in TMDB movies list API
+ -Able to fetch the data
+- Created the custom hook'
+-updated the movie slice
+- video container and title 
+-secondary container
+- fetch data for trailer video
+- embedded the youtube video and make it autoplay
+- 
 
 
 
